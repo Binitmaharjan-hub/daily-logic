@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager App</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .container { margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
+        .task-card { 
+            background: #f9f9f9; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            margin-bottom: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        .status-done { color: green; font-weight: bold; }
+        .status-pending { color: orange; font-weight: bold; }
+        button.delete-btn { background: #ff4444; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h3>Task Manager App</h3>
+    
+    <div>
+        <label>Task: <input type="text" id="task"/></label>
+        <label>Status: 
+            <select id="status">
+                <option value="pending">Pending</option>
+                <option value="done">Done</option>
+            </select>
+        </label>
+        <button id="addbtn">Add Task</button>
+    </div>
+
+    <div class="container">
+        <label>Search/Filter: 
+            <select id="search">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="done">Done</option>
+            </select>
+        </label>
+        
+        <div id="display"></div>
+        <p id="displayCount"></p>
+
+    </div>
+
+    <script>
+        const TaskInput = document.getElementById("task");
+        const StatusInput = document.getElementById("status");
+        const Addbtn = document.getElementById("addbtn");
+        const Search = document.getElementById("search");
+        const Display = document.getElementById("display");
+
+        let storeTask = [];
+
+        Addbtn.addEventListener("click", () => {
+            if (TaskInput.value.trim() === "") {
+                alert("Please enter a task name");
+                return;
+            }
+
+            const taskObj = {
+                id: Date.now(), 
+                taskName: TaskInput.value,
+                statusTask: StatusInput.value
+            };
+
+            storeTask.push(taskObj);
+            TaskInput.value = ""; 
+            render();
+        });
+
+        window.deleteTask = (idToDelete) => {
+            storeTask = storeTask.filter(task => task.id !== idToDelete);
+            render();
+        };
+
+        const render = () => {
+            const filterValue = Search.value;
+            document.getElementById("displayCount").innerHTML=(`tasksadded=${storeTask.length}`)
+            const filteredList = storeTask.filter(item => {
+                if (filterValue === "all") return true;
+                return item.statusTask === filterValue;
+            });
+
+            if (filteredList.length === 0) {
+                Display.innerHTML = "<p>No tasks found.</p>";
+                return;
+            }
+
+            Display.innerHTML = filteredList.map(r => `
+                <div class="task-card">
+                    <div>
+                        <strong>Task:</strong> ${r.taskName} <br>
+                        <span class="status-${r.statusTask}">(${r.statusTask})</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${r.id})">Delete</button>
+                </div>
+            `).join("");
+        };
+        
+
+        Search.addEventListener("change", render);
+
+    </script>
+</body>
+</html>
