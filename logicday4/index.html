@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shopping cart</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="modal">
+    <div id="modal-content">
+    <h2 class="heading">cart items</h2>
+    <span id="close">&times;</span>
+    <div id="cartItems"></div>
+    </div>
+    </div>
+    <button id="btn" class="btn">show Cart</button>
+    <div id="display-items"></div>
+    <p id="total"></p>
+    <script>
+        const display=document.getElementById("display-items");
+        const closeCart=document.getElementById("close");
+        const showCart=document.getElementById("modal");
+        const displayCartItems=document.getElementById("cartItems")
+    const products = [
+    { id: 1, name: "Laptop", price: 999, category: "tech" },
+    { id: 2, name: "Headphones", price: 49, category: "tech" },
+    { id: 3, name: "T-Shirt", price: 19, category: "clothing" },
+    { id: 4, name: "Jeans", price: 49, category: "clothing" },
+    { id: 5, name: "Rice (1kg)", price: 3, category: "food" },
+    { id: 6, name: "Olive Oil", price: 8, category: "food" },
+    { id: 7, name: "Notebook", price: 5, category: "stationery" },
+    { id: 8, name: "Pen Set", price: 7, category: "stationery" },
+];
+display.innerHTML=products.map(product=>{
+    return `<div class="item-card">
+        <div class="item-list">
+        <p>product name:${product.name}</p>
+        <p>price:$${product.price}</p>
+        <p >category:${product.category}</p>
+        <div>
+        <button id="add-to-cart" onclick="addToCart(${product.id})">Add to cart</button>
+        </div>
+        </div>
+        </div>`
+}).join("");
+
+    const addItemstoCart=document.getElementById("add-to-cart");
+    let storeItems=[];
+    window.addToCart=(id)=>{
+        let obj=products.find(item=>item.id===id);
+        let existing=storeItems.find(item=>item.id===id);
+        if(existing){
+            existing.quantity++
+        }
+        else{
+            storeItems.push({...obj,quantity:1})
+        }
+        alert("item sucessfully added");
+        render();
+    }
+    window.deleteItem=(id)=>{
+        storeItems=storeItems.filter(item=>item.id!==id)
+        render();
+    }
+    window.decreaseQty=(id)=>{
+        let decrease=storeItems.find(item=>item.id===id);
+        
+        if(decrease.quantity>1){
+            decrease.quantity--
+        }
+        else{
+            deleteItem(id);
+        }
+                    render();
+    }
+      window.increaseQty=(id)=>{
+        let increase=storeItems.find(item=>item.id===id);
+            increase.quantity++;
+                        render();
+    }
+    const totalprice=()=>{
+         return storeItems.reduce((acc,item)=> acc+item.price*item.quantity,0)
+    }
+const render=()=>{
+    displayCartItems.innerHTML=storeItems.map(product=>{
+        return`<div class="item-card">
+        <div class="item-list">
+        <p>product name:${product.name}</p>
+        <p>price:$${product.price}</p>
+        <p >category:${product.category}</p>
+        <p>Quantity:${product.quantity}</p>
+        <div>
+        <button id="deleteitem" onclick="deleteItem(${product.id})">Delete</button>
+        <button onclick="decreaseQty(${product.id})">-</button>
+${product.quantity}
+<button onclick="increaseQty(${product.id})">+</button>
+        </div>
+        </div>
+        </div>`
+}).join("");
+
+const totalVal=document.getElementById("total");
+totalVal.textContent=`Totalprice:$${totalprice()}`;
+}
+
+document.getElementById("btn").addEventListener("click",()=>{
+    showCart.style.display="block";
+})
+closeCart.onclick=function(){
+    showCart.style.display="none";
+}
+    </script>
+</body>
+</html>
